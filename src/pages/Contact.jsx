@@ -20,7 +20,6 @@ export const Contact = () => {
           console.log("Contactos recibidos:", contacts); // Debug
           dispatch({ type: "LOAD_CONTACTS", payload: contacts });
           console.log("Respuesta completa:", data);
-          console.log("Contactos extraídos:", data.results);
         })
         .catch(error => {
           console.error("Error en la solicitud:", error);

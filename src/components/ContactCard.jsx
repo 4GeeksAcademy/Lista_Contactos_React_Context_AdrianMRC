@@ -4,12 +4,11 @@ import { useState } from "react";
 import { Modal } from "../components/Modal";
 
 export const ContactCard = ({ contact }) => {
-  // Llamar los hooks solo una vez al inicio del componente
+ 
   const { store, dispatch } = useGlobalReducer();
   const [showModal, setShowModal] = useState(false);
 
   const handleDelete = () => {
-    // Usar store obtenido del hook en el nivel superior
     fetch(`https://playground.4geeks.com/contact/agendas/${store.currentAgenda}/contacts/${contact.id}`, {
       method: "DELETE",
       headers: { "Accept": "application/json" }
@@ -27,7 +26,7 @@ export const ContactCard = ({ contact }) => {
   );
   const avatarColor = `hsl(${nameHash % 360}, 70%, 40%)`;
 
-  // Generar iniciales
+  
   const initials = contact.name
     .split(' ')
     .map(part => part[0])

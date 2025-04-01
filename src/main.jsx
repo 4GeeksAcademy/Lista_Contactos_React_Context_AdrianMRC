@@ -6,19 +6,13 @@ import { router } from "./routes";  // Import the router configuration
 import { StoreProvider } from './hooks/useGlobalReducer';  // Import the StoreProvider for global state management
 import { ToastContainer } from 'react-toastify';
 
-const Main = () => {
-    return (
-        <React.StrictMode>  
-            {/* Provide global state to all components */}
-            <StoreProvider> 
-                {/* Set up routing for the application */} 
-                <RouterProvider router={router}>
-                </RouterProvider>
-                <ToastContainer />
-            </StoreProvider>
-        </React.StrictMode>
-    );
-}
+const root = ReactDOM.createRoot(document.getElementById('root'))
 
-// Render the Main component into the root DOM element.
-ReactDOM.createRoot(document.getElementById('root')).render(<Main />)
+root.render(
+  <React.StrictMode>
+    <StoreProvider>
+      <RouterProvider router={router} />
+      <ToastContainer/>
+    </StoreProvider>
+  </React.StrictMode>
+)

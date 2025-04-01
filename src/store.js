@@ -22,7 +22,8 @@ export function storeReducer(state, action) {
 
     case ACTIONS.ADD_CONTACT:
       return {
-        ...state, contacts: [action.payload, ...state.contacts]
+        ...state,
+        contacts: [action.payload, ...state.contacts]
       };
 
     case ACTIONS.UPDATE_CONTACT:
@@ -40,7 +41,9 @@ export function storeReducer(state, action) {
       };
 
     case ACTIONS.SET_AGENDA:
-      return { ...state, currentAgenda: action.payload };
+      return { 
+        ...state, 
+        currentAgenda: action.payload };
     default:
       return state;
   }

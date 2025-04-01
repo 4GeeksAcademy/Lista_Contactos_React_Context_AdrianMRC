@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -39,15 +39,15 @@ export const AddContact = () => {
 
       const response = await fetch(url, {
         method: id ? "PUT" : "POST",
-        headers: { 
+        headers: {
           "Accept": "application/json",
-          "Content-Type": "application/json" 
+          "Content-Type": "application/json"
         },
         body: JSON.stringify(form)
       });
 
       const data = await response.json();
-      
+
       if (!response.ok) {
         const errorMessage = data.detail?.[0]?.msg || data.detail || "Error desconocido";
         throw new Error(errorMessage);
@@ -56,7 +56,7 @@ export const AddContact = () => {
       dispatch({ type: id ? "UPDATE_CONTACT" : "ADD_CONTACT", payload: data });
       toast.success(`Contacto ${id ? "actualizado" : "creado"} correctamente 🎉`);
       navigate("/contacts");
-      
+
     } catch (error) {
       toast.error(error.message || "Error crítico al guardar");
       console.error("Detalle del error:", error);
@@ -68,13 +68,13 @@ export const AddContact = () => {
   return (
     <div className="container mt-4">
       <h2>{id ? "Editar" : "Nuevo"} Contacto</h2>
-      <button 
+      <Link
+        to="/contacts"
         className="btn btn-outline-secondary mb-2"
-        onClick={() => navigate("/contacts")}
       >
         <i className="fas fa-arrow-left me-2"></i>
         Volver a Contactos
-      </button>
+      </Link>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <input
