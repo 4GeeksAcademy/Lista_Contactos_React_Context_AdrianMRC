@@ -14,22 +14,19 @@ export const AddContact = () => {
     email: "",
     address: ""
   });
-  const [isSubmitting, setIsSubmitting] = useState(false); // Estado añadido
 
   useEffect(() => {
     if (id) {
-      const contact = store.contacts.find(c => c.id === parseInt(id));
+      const contact = store.contacts.find(contact => contact.id === parseInt(id));
       if (contact) setForm(contact);
     }
   }, [id, store.contacts]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
     if (!store.currentAgenda) {
-      toast.error("¡Selecciona una agenda primero!");
-      setIsSubmitting(false);
+      toast.error("Select an agenda first!");
       return;
     }
 
@@ -54,33 +51,31 @@ export const AddContact = () => {
       }
 
       dispatch({ type: id ? "UPDATE_CONTACT" : "ADD_CONTACT", payload: data });
-      toast.success(`Contacto ${id ? "actualizado" : "creado"} correctamente 🎉`);
+      toast.success(`Contact ${id ? "updated" : "created"} correctly 🎉`);
       navigate("/contacts");
 
     } catch (error) {
-      toast.error(error.message || "Error crítico al guardar");
-      console.error("Detalle del error:", error);
-    } finally {
-      setIsSubmitting(false);
+      toast.error(error.message || "Critical save error");
+      console.error("Error detail:", error);
     }
   };
 
   return (
     <div className="container mt-4">
-      <h2>{id ? "Editar" : "Nuevo"} Contacto</h2>
+      <h2>{id ? "Update" : "New"} Contact</h2>
       <Link
         to="/contacts"
         className="btn btn-outline-secondary mb-2"
       >
         <i className="fas fa-arrow-left me-2"></i>
-        Volver a Contactos
+        Back to contacts
       </Link>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <input
             type="text"
             className="form-control"
-            placeholder="Nombre completo"
+            placeholder="Full Name"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             required
@@ -90,7 +85,7 @@ export const AddContact = () => {
           <input
             type="email"
             className="form-control"
-            placeholder="Correo electrónico"
+            placeholder="E-mail"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             required
@@ -100,7 +95,7 @@ export const AddContact = () => {
           <input
             type="tel"
             className="form-control"
-            placeholder="Teléfono"
+            placeholder="Phone Number"
             value={form.phone}
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
             required
@@ -110,14 +105,14 @@ export const AddContact = () => {
           <input
             type="text"
             className="form-control"
-            placeholder="Dirección"
+            placeholder="Address"
             value={form.address}
             onChange={(e) => setForm({ ...form, address: e.target.value })}
             required
           />
         </div>
         <button type="submit" className="btn btn-primary">
-          {id ? "Actualizar" : "Guardar"}
+          {id ? "Update" : "Save"}
         </button>
       </form>
     </div>

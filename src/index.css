@@ -14,12 +14,30 @@
   transition: transform 0.2s ease;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-/* Efectos para la page demo */
-.card {
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  transition: transform 0.2s;
+/* estilos para el modal */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  --bs-backdrop-bg: rgba(0, 0, 0, 0.5) !important;
+  --bs-backdrop-opacity: 1 !important;
+  background: var(--bs-backdrop-bg) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
 }
 
-.card:hover {
-  transform: translateY(-2px);
+.modal-content {
+  position: relative;
+  background-color: rgb(255, 255, 255);
+  padding: 1.5rem;
+  border-radius: 0.3rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 4px 6px rgba(0,0,0);
+  z-index: 1051; 
+  transform: none !important;
 }

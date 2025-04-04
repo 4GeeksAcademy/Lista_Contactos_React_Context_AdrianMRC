@@ -2,37 +2,48 @@ import { Link } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import { useState } from "react";
 import { Modal } from "../components/Modal";
+import { toast } from "react-toastify";
 
 export const ContactCard = ({ contact }) => {
- 
+
   const { store, dispatch } = useGlobalReducer();
   const [showModal, setShowModal] = useState(false);
 
-  const handleDelete = () => {
-    fetch(`https://playground.4geeks.com/contact/agendas/${store.currentAgenda}/contacts/${contact.id}`, {
-      method: "DELETE",
-      headers: { "Accept": "application/json" }
-    })
-      .then(res => {
-        if (!res.ok) throw new Error(`Error ${res.status}`);
-        dispatch({ type: "DELETE_CONTACT", payload: contact.id });
-      })
-      .catch(error => console.error("Delete error:", error))
-      .finally(() => setShowModal(false));
+  const handleDelete = async () => {
+
+    try {
+      const response = await fetch(
+        `https://playground.4geeks.com/contact/agendas/${store.currentAgenda}/contacts/${contact.id}`,
+        {
+          method: "DELETE",
+          headers: { "Accept": "application/json" }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+
+      dispatch({ type: "DELETE_CONTACT", payload: contact.id });
+      toast.success(`Contact ${contact.name} removed successfully`);
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error(error.message || "Error deleting contact");
+    } finally { setShowModal(false) }
   };
 
+  //Avatar dinámico
   const nameHash = contact.name.split('').reduce((acc, char) =>
     char.charCodeAt(0) + acc, 0
   );
   const avatarColor = `hsl(${nameHash % 360}, 70%, 40%)`;
-
-  
-  const initials = contact.name
-    .split(' ')
-    .map(part => part[0])
-    .join('')
-    .toUpperCase()
-    .substring(0, 2);
+  const generateInitials = (name) => {
+    const parts = name.split(' ').filter(part => part.trim().length > 0);
+    if (parts.length >= 2) return parts[0][0] + parts[1][0];
+    if (parts.length === 1 && parts[0].length >= 2) return parts[0].substring(0, 2);
+    return '??';
+  };
+  const initials = generateInitials(contact.name).toUpperCase();
 
 
   return (
@@ -64,54 +75,52 @@ export const ContactCard = ({ contact }) => {
               <i className="fas fa-envelope me-1"></i>
               {contact.email}
             </p>
-            {contact.address && (
-              <p className="card-text">
-                <i className="fas fa-map-marker-alt me-1"></i>
-                {contact.address}
-              </p>
-            )}
+            <p className="card-text">
+              <i className="fas fa-map-marker-alt me-1"></i>
+              {contact.address}
+            </p>
           </div>
         </div>
 
-        {/* Botones de acciones */}
         <div className="d-flex gap-2 mt-3">
           <Link
             to={`/edit-contact/${contact.id}`}
             className="btn btn-sm btn-outline-warning"
+            aria-label={`Editar ${contact.name}`}
           >
             <i className="fas fa-edit"></i>
           </Link>
           <button
             onClick={() => setShowModal(true)}
             className="btn btn-sm btn-outline-danger"
+            aria-label={`Eliminar ${contact.name}`}
           >
             <i className="fas fa-trash"></i>
           </button>
         </div>
 
-        {/* Modal de confirmación */}
-        <Modal show={showModal} onClose={() => setShowModal(false)}>
+        <Modal
+          show={showModal}
+          onClose={() => setShowModal(false)}
+          showFooter={false}
+        >
           <div className="text-center">
-            <h4 className="mb-3 fw-bold">Confirmar eliminación</h4>
-            <p className="text-muted mb-4">
-              ¿Estás seguro de querer eliminar a <strong>{contact.name}</strong>?
-              Esta acción no se puede deshacer.
-            </p>
+            <h4>Delete {contact.name}</h4>
+            <p>Are you sure you want to delete this contact?</p>
+            <p><strong>This action cannot be undone!</strong></p>
 
-            <div className="d-flex justify-content-center gap-3">
+            <div className="d-flex justify-content-center gap-3 mt-4">
               <button
-                className="btn btn-lg btn-outline-secondary"
+                className="btn btn-secondary"
                 onClick={() => setShowModal(false)}
-                style={{ minWidth: '120px' }}
               >
-                <i className="fas fa-times me-2"></i>Cancelar
+                Cancel
               </button>
               <button
-                className="btn btn-lg btn-danger"
+                className="btn btn-danger"
                 onClick={handleDelete}
-                style={{ minWidth: '120px' }}
               >
-                <i className="fas fa-trash me-2"></i>Eliminar
+                Delete
               </button>
             </div>
           </div>

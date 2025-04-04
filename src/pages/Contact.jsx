@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import { ContactCard } from "../components/ContactCard";
 import { Link } from "react-router-dom";
-import { AgendaSelector } from "../components/AgendaSelector"; // Importación faltante
+import { AgendaSelector } from "../components/AgendaSelector";
 
 export const Contact = () => {
   const { store, dispatch } = useGlobalReducer();
@@ -17,7 +17,7 @@ export const Contact = () => {
         .then(data => {
           // Extraer los contactos de la propiedad 'results'
           const contacts = Array.isArray(data.contacts) ? data.contacts : [];
-          console.log("Contactos recibidos:", contacts); // Debug
+          console.log("Contactos recibidos:", contacts);
           dispatch({ type: "LOAD_CONTACTS", payload: contacts });
           console.log("Respuesta completa:", data);
         })
@@ -29,7 +29,7 @@ export const Contact = () => {
   }, [store.currentAgenda]);
 
   if (!store.currentAgenda) {
-    return <AgendaSelector />; // Ahora está correctamente importado
+    return <AgendaSelector />; 
   }
 
   return (
@@ -50,12 +50,10 @@ export const Contact = () => {
         </div>
       </div>
       
-      {/* Protección adicional contra datos no array */}
       {Array.isArray(store.contacts) && store.contacts.map(contact => (
         <ContactCard key={contact.id} contact={contact} />
       ))}
       
-      {/* Mensaje para agenda vacía */}
       {Array.isArray(store.contacts) && store.contacts.length === 0 && (
         <div className="alert alert-info mt-3">
           No contacts found in this agenda.{" "}

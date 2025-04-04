@@ -15,7 +15,7 @@ export const Home = () => {
 			  }}
 			/>
 			<p className="fs-3 text-muted mb-5">
-			  Gestiona tus contactos de forma fácil y eficiente
+			  Manage your contacts easily and efficiently
 			</p>
 			</div>
       </main>
