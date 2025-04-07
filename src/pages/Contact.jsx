@@ -1,67 +1,65 @@
 import { useEffect } from "react";
-import useGlobalReducer from "../hooks/useGlobalReducer";
+import { Link, useNavigate } from "react-router-dom";
+import { useContacts } from "../hooks/useContacts";
+import { useAgendas } from "../hooks/useAgendas";
 import { ContactCard } from "../components/ContactCard";
-import { Link } from "react-router-dom";
-import { AgendaSelector } from "../components/AgendaSelector";
+import { toast } from "react-toastify";
 
 export const Contact = () => {
-  const { store, dispatch } = useGlobalReducer();
+  const navigate = useNavigate();
 
+  const { currentAgenda, clearCurrentAgenda } = useAgendas();
+  const { contacts, loadContacts, deleteContact, loading, error } = useContacts();
+
+  // Sin agenda seleccionada? vuelves a selector
   useEffect(() => {
-    if (store.currentAgenda) {
-      fetch(`https://playground.4geeks.com/contact/agendas/${store.currentAgenda}/contacts`)
-        .then(res => {
-          if (!res.ok) throw new Error("Error cargando contactos: " + res.status);
-          return res.json();
-        })
-        .then(data => {
-          // Extraer los contactos de la propiedad 'results'
-          const contacts = Array.isArray(data.contacts) ? data.contacts : [];
-          console.log("Contactos recibidos:", contacts);
-          dispatch({ type: "LOAD_CONTACTS", payload: contacts });
-          console.log("Respuesta completa:", data);
-        })
-        .catch(error => {
-          console.error("Error en la solicitud:", error);
-          dispatch({ type: "LOAD_CONTACTS", payload: [] });
-        });
-    }
-  }, [store.currentAgenda]);
+    if (!currentAgenda) navigate('/agenda-selector');
+    else loadContacts();
+  }, [currentAgenda, loadContacts, navigate]);
 
-  if (!store.currentAgenda) {
-    return <AgendaSelector />; 
+  const handleDelete = async (id) => {
+    try {
+      await deleteContact(id);
+      toast.success("Contacto eliminado 🗑");
+    } catch(err) {
+      toast.error(err.message || "Error eliminando contacto");
+    }
   }
+
+  const handleChangeAgenda = () => {
+    clearCurrentAgenda();
+    navigate('/agenda-selector');
+  };
 
   return (
     <div className="container mt-4">
+
       <div className="d-flex justify-content-between align-items-center mb-4">
-      <h1>Contacts - {store.currentAgenda}</h1>
+        <h1>Agenda: {currentAgenda}</h1>
         <div className="d-flex gap-2">
           <Link to="/add-contact" className="btn btn-primary">
-            <i className="fas fa-plus me-2"></i>
-            Add Contact
+            <i className="fas fa-plus me-2"></i>Nuevo contacto
           </Link>
-          <button 
-            className="btn btn-secondary"
-            onClick={() => dispatch({ type: "SET_AGENDA", payload: null })}
-          >
-            Change Agenda
+          <button onClick={handleChangeAgenda} className="btn btn-secondary">
+            <i className="fas fa-exchange-alt me-2"></i>Cambiar agenda
           </button>
         </div>
       </div>
-      
-      {Array.isArray(store.contacts) && store.contacts.map(contact => (
-        <ContactCard key={contact.id} contact={contact} />
-      ))}
-      
-      {Array.isArray(store.contacts) && store.contacts.length === 0 && (
-        <div className="alert alert-info mt-3">
-          No contacts found in this agenda.{" "}
-          <Link to="/add-contact" className="alert-link">
-            Create your first contact
-          </Link>
+
+      {loading && <p>Cargando contactos...</p>}
+      {error && <p className="text-danger">Error: {error}</p>}
+
+      {!loading && contacts.length === 0 && (
+        <div className="alert alert-info">
+          No tienes contactos en esta agenda.
+          <Link className="alert-link ms-1" to="/add-contact">Crea tu primer contacto</Link>
         </div>
       )}
+
+      {contacts.map((c) => (
+        <ContactCard key={c.id} contact={c} onDelete={handleDelete} />
+      ))}
+
     </div>
-  );
-};
+  )
+}

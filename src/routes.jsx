@@ -5,18 +5,19 @@ import { Demo } from "./pages/Demo";
 import { Contact } from "./pages/Contact";
 import { AddContact } from "./pages/AddContact";
 import { Error } from "./pages/Error";
+import { AgendaSelector } from "./components/AgendaSelector";
 
 
 export const router = createBrowserRouter(
-    createRoutesFromElements(
-      // Root Route: All navigation will start from here.
-      <Route path="/" element={<Layout />} errorElement={<Error />} >
-        {/* Nested Routes: Defines sub-routes within the BaseHome component. */}
-        <Route path= "/home" element={<Home />} />
-        <Route path="/demo" element={<Demo />} />
-        <Route path="/contacts" element={<Contact />} />
-        <Route path="/add-contact" element={<AddContact />} />
-        <Route path="/edit-contact/:id" element={<AddContact />} />
-      </Route>
-    )
+  createRoutesFromElements(
+    // Root Route: All navigation will start from here.
+    <Route path="/" element={<Layout />} errorElement={<Error />} >
+      <Route path="/home" element={<Home />} />
+      <Route path="/demo" element={<Demo />} />
+      <Route path="/agenda-selector" element={<AgendaSelector />} />
+      <Route path="/contacts" element={<Contact />} />
+      <Route path="/add-contact" element={<AddContact />} />
+      <Route path="/edit-contact/:id" element={<AddContact />} />
+    </Route>
+  )
 );

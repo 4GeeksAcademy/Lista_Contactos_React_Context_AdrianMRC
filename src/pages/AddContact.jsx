@@ -1,120 +1,69 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
-import useGlobalReducer from "../hooks/useGlobalReducer";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useContacts } from '../hooks/useContacts';
+import { toast } from 'react-toastify';
+import { ContactForm } from '../components/ContactForm';
 
 export const AddContact = () => {
   const { id } = useParams();
-  const { store, dispatch } = useGlobalReducer();
   const navigate = useNavigate();
-  const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    address: ""
+
+  const {
+    agendaSlug,
+    contacts,
+    addContact,
+    updateContact
+  } = useContacts();
+
+  const [initialData, setInitialData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    address: ''
   });
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    if (id) {
-      const contact = store.contacts.find(contact => contact.id === parseInt(id));
-      if (contact) setForm(contact);
+    if (id && contacts?.length) {
+      const found = contacts.find(c => c.id === parseInt(id));
+      if (found) setInitialData(found);
     }
-  }, [id, store.contacts]);
+  }, [id, contacts]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!store.currentAgenda) {
-      toast.error("Select an agenda first!");
-      return;
-    }
-
+  const handleSubmit = async (data) => {
+    setLoading(true);
     try {
-      const baseUrl = `https://playground.4geeks.com/contact/agendas/${store.currentAgenda}/contacts`;
-      const url = id ? `${baseUrl}/${id}` : baseUrl;
-
-      const response = await fetch(url, {
-        method: id ? "PUT" : "POST",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(form)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        const errorMessage = data.detail?.[0]?.msg || data.detail || "Error desconocido";
-        throw new Error(errorMessage);
+      if (id) {
+        await updateContact(id, data);
+        toast.success('Contacto actualizado correctamente 🎉');
+      } else {
+        await addContact(data);
+        toast.success('Contacto creado correctamente 🎉');
       }
-
-      dispatch({ type: id ? "UPDATE_CONTACT" : "ADD_CONTACT", payload: data });
-      toast.success(`Contact ${id ? "updated" : "created"} correctly 🎉`);
-      navigate("/contacts");
-
+      navigate('/contacts');
     } catch (error) {
-      toast.error(error.message || "Critical save error");
-      console.error("Error detail:", error);
+      toast.error(error.message || 'Error guardando contacto');
+    } finally {
+      setLoading(false);
     }
   };
 
+  if (!agendaSlug) return <p>Selecciona una agenda para añadir contactos</p>;
+
   return (
     <div className="container mt-4">
-      <h2>{id ? "Update" : "New"} Contact</h2>
-      <Link
-        to="/contacts"
-        className="btn btn-outline-secondary mb-2"
-      >
-        <i className="fas fa-arrow-left me-2"></i>
-        Back to contacts
+      <h2>{id ? 'Update' : 'New'} Contact</h2>
+
+      <Link to="/contacts" className="btn btn-outline-secondary mb-3">
+        <i className="fas fa-arrow-left me-2"></i>Back to contacts
       </Link>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Full Name"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            required
-          />
-        </div>
-        <div className="mb-3">
-          <input
-            type="email"
-            className="form-control"
-            placeholder="E-mail"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            required
-          />
-        </div>
-        <div className="mb-3">
-          <input
-            type="tel"
-            className="form-control"
-            placeholder="Phone Number"
-            value={form.phone}
-            onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            required
-          />
-        </div>
-        <div className="mb-3">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Address"
-            value={form.address}
-            onChange={(e) => setForm({ ...form, address: e.target.value })}
-            required
-          />
-        </div>
-        <button type="submit" className="btn btn-primary">
-          {id ? "Update" : "Save"}
-        </button>
-      </form>
+
+      <ContactForm
+        initialData={initialData}
+        onSubmit={handleSubmit}
+        submitting={loading}
+      />
     </div>
-  );
+  )
 };
