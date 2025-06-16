@@ -42,11 +42,12 @@ const ApiClient = {
 
   // ======================== CONTACTOS ========================
   Contacts: {
-    getByAgenda: async (agendaSlug) => {
-      const response = await fetch(`${BASE_URL}/agendas/${agendaSlug}/contacts`);
-      if (response.status === 429) throw new Error('Demasiadas peticiones. Intenta otra vez en unos segundos.');
-      return response.json().then(data => data.contacts || []);
-    },
+  getByAgenda: async (agendaSlug) => {
+    const response = await fetch(`${BASE_URL}/agendas/${agendaSlug}/contacts`);
+    if (response.status === 429) throw new Error('Demasiadas peticiones. Intenta otra vez en unos segundos.');
+    if (!response.ok) throw new Error('La agenda no existe');
+    return response.json().then(data => data.contacts || []);
+  },
 
     create: (agendaSlug, contactData) => fetch(`${BASE_URL}/agendas/${agendaSlug}/contacts`, {
       method: "POST",
