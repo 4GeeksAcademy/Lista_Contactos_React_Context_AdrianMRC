@@ -10,7 +10,6 @@ import { AgendaSelector } from "./components/AgendaSelector";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
-    // Root Route: All navigation will start from here.
     <Route path="/" element={<Layout />} errorElement={<Error />} >
       <Route path="/home" element={<Home />} />
       <Route path="/demo" element={<Demo />} />
