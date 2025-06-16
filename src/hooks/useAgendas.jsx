@@ -1,4 +1,3 @@
-// src/hooks/useAgendas.js
 import { useGlobalReducer } from "./useGlobalReducer";
 import { agendaOperations } from "../store/agendaStore";
 
